@@ -1,0 +1,70 @@
+plugins {
+    id 'fabric-loom' version '1.10.5'
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+base { archivesName = project.archives_base_name }
+
+repositories { mavenCentral() }
+
+loom {
+    splitEnvironmentSourceSets()
+    mods {
+        noopsnet_outfits {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}
+
+tasks.withType(JavaCompile).configureEach { options.release = 21 }
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
+}
+test { useJUnitPlatform() }
+
+// Check the deliverable, in addition to compiling the development classpath.
+tasks.register('verifyModJar') {
+    dependsOn tasks.named('remapJar')
+    inputs.file(tasks.named('remapJar').flatMap { it.archiveFile })
+    doLast {
+        def artifact = tasks.named('remapJar').get().archiveFile.get().asFile
+        new java.util.zip.ZipFile(artifact).withCloseable { zip ->
+            def required = ['fabric.mod.json',
+                'net/noopsnet/outfits/NoopsnetOutfits.class',
+                'net/noopsnet/outfits/client/OutfitsClient.class',
+                'net/noopsnet/outfits/client/OutfitFeatureRenderer.class']
+            ['pin', 'patch'].each { slot ->
+                ['rainbow', 'trans', 'nonbinary', 'bi', 'pan', 'lesbian', 'ace', 'genderfluid'].each { design ->
+                    required.add("assets/noopsnet_outfits/textures/accessory/${slot}/${design}.png".toString())
+                }
+            }
+            required.each { path ->
+                if (zip.getEntry(path) == null) throw new GradleException("Incomplete mod JAR: ${path}")
+            }
+        }
+    }
+}
+tasks.named('build') { dependsOn tasks.named('verifyModJar') }
+
+// Include the public source license and resource notices in built artifacts.
+tasks.named('jar') { from('../LICENSE'); from('../NOTICE.md') }

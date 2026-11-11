@@ -1,0 +1,19 @@
+{
+  "noopsnet_outfits.title": "Your little details",
+  "noopsnet_outfits.pin": "Heart pin",
+  "noopsnet_outfits.patch": "Stitched patch",
+  "noopsnet_outfits.visibility": "Visible to players with NoopsNet Outfits.",
+  "noopsnet_outfits.design.none": "None",
+  "noopsnet_outfits.design.rainbow": "Rainbow",
+  "noopsnet_outfits.design.trans": "Trans",
+  "noopsnet_outfits.design.nonbinary": "Nonbinary",
+  "noopsnet_outfits.design.bi": "Bi",
+  "noopsnet_outfits.design.pan": "Pan",
+  "noopsnet_outfits.design.lesbian": "Lesbian",
+  "noopsnet_outfits.design.ace": "Ace",
+  "noopsnet_outfits.design.genderfluid": "Genderfluid",
+  "noopsnet_outfits.invalid_design": "Choose a design from the suggestions, or use none.",
+  "noopsnet_outfits.updated": "Your accessory is updated!",
+  "noopsnet_outfits.cleared": "Your pin and patch are now unequipped.",
+  "noopsnet_outfits.install_client": "Install NoopsNet Outfits on your client to open the wardrobe."
+}

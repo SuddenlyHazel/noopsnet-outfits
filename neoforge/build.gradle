@@ -1,0 +1,72 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+version = project.mod_version
+group = 'net.noopsnet'
+base { archivesName = 'noopsnet-outfits-neoforge' }
+java { toolchain.languageVersion = JavaLanguageVersion.of(21); withSourcesJar() }
+repositories { mavenCentral() }
+
+// Keep the original design IDs, slot behavior, translations and pixel art shared.
+def fabricProject = file('../fabric')
+def sharedJava = tasks.register('sharedJava', Sync) {
+    from(new File(fabricProject, 'src/main/java')) {
+        include 'net/noopsnet/outfits/Design.java', 'net/noopsnet/outfits/Outfit.java'
+    }
+    into layout.buildDirectory.dir('generated/sharedJava')
+}
+sourceSets.main.java.srcDir(sharedJava)
+sourceSets.main.resources.srcDir(new File(fabricProject, 'src/main/resources'))
+sourceSets.main.resources.exclude('fabric.mod.json')
+sourceSets { client }
+sourceSets.client.compileClasspath += sourceSets.main.output
+sourceSets.client.runtimeClasspath += sourceSets.main.output
+configurations.clientImplementation.extendsFrom configurations.implementation
+configurations.clientRuntimeOnly.extendsFrom configurations.runtimeOnly
+
+neoForge {
+    enable { version = project.neo_version; disableRecompilation = true }
+    addModdingDependenciesTo sourceSets.client
+    mods {
+        noopsnet_outfits { sourceSet sourceSets.main; sourceSet sourceSets.client }
+    }
+    unitTest { enable(); testedMod = mods.noopsnet_outfits }
+    runs {
+        server { server(); programArgument '--nogui' }
+        client { client(); sourceSet = sourceSets.client }
+    }
+}
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.11.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('META-INF/neoforge.mods.toml') { expand version: project.version }
+}
+tasks.named('jar') { from sourceSets.client.output }
+tasks.named('sourcesJar') { from sourceSets.client.allSource }
+tasks.withType(JavaCompile).configureEach { options.release = 21; options.encoding = 'UTF-8' }
+test { useJUnitPlatform() }
+tasks.register('verifyModJar') {
+    dependsOn tasks.named('jar')
+    doLast {
+        new java.util.zip.ZipFile(tasks.jar.archiveFile.get().asFile).withCloseable { zip ->
+            def paths = ['META-INF/neoforge.mods.toml', 'net/noopsnet/outfits/NoopsnetOutfits.class',
+                'net/noopsnet/outfits/client/OutfitsClient.class', 'net/noopsnet/outfits/client/OutfitFeatureRenderer.class']
+            ['pin', 'patch'].each { slot ->
+                ['rainbow', 'trans', 'nonbinary', 'bi', 'pan', 'lesbian', 'ace', 'genderfluid'].each { design ->
+                    paths.add("assets/noopsnet_outfits/textures/accessory/${slot}/${design}.png".toString())
+                }
+            }
+            paths.each { if (zip.getEntry(it) == null) throw new GradleException("Missing mod entry: ${it}") }
+            if (zip.getEntry('fabric.mod.json') != null) throw new GradleException('Wrong loader metadata')
+        }
+    }
+}
+tasks.named('check') { dependsOn tasks.named('verifyModJar') }
+
+// Include the public source license and resource notices in built artifacts.
+tasks.named('jar') { from('../LICENSE'); from('../NOTICE.md') }

@@ -1,0 +1,15 @@
+{
+  "source_revision": "5e0a0f8b925cd26245225a413a52977eac1c99fd",
+  "snapshot_date": "2026-11-11",
+  "project": "NoopsNet Outfits",
+  "artifacts": [
+    {
+      "filename": "noopsnet-outfits-neoforge-0.2.0.jar",
+      "version": "0.2.0",
+      "hashes": {
+        "sha1": "189fdf8b27ccb1efd450d88269cc1e952931d27b",
+        "sha512": "a23dad34f4b7725fc2921a303acaf484d1b4b5cd42aa1f2913f97c02876017a96cd91b00edd6664bbf9821a974516fdf03b20a17c55f726137feb85c511f32f7"
+      }
+    }
+  ]
+}
