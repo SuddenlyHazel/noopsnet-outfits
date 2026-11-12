@@ -40,16 +40,36 @@ public final class OutfitScreen extends Screen {
             for (Design design : Design.values()) {
                 boolean selected = (slot == 0 ? outfit.pin() : outfit.patch()) == design;
                 Text label = Text.translatable(design.translationKey());
-                if (selected) label = Text.literal("[ ").append(label).append(" ]").formatted(Formatting.LIGHT_PURPLE);
-                addDrawableChild(ButtonWidget.builder(label, button -> {
-                    if (ClientPlayNetworking.canSend(OutfitPayloads.Select.ID)) {
-                        ClientPlayNetworking.send(new OutfitPayloads.Select(selectedSlot, design.ordinal()));
-                    }
-                }).dimensions(left + 12 + slot * 156, top + 47 + design.ordinal() * rowStep, 140, rowStep - 1).build());
+                if (selected)
+                    label =
+                            Text.literal("[ ")
+                                    .append(label)
+                                    .append(" ]")
+                                    .formatted(Formatting.LIGHT_PURPLE);
+                addDrawableChild(
+                        ButtonWidget.builder(
+                                        label,
+                                        button -> {
+                                            if (ClientPlayNetworking.canSend(
+                                                    OutfitPayloads.Select.ID)) {
+                                                ClientPlayNetworking.send(
+                                                        new OutfitPayloads.Select(
+                                                                selectedSlot, design.ordinal()));
+                                            }
+                                        })
+                                .dimensions(
+                                        left + 12 + slot * 156,
+                                        top + 47 + design.ordinal() * rowStep,
+                                        140,
+                                        rowStep - 1)
+                                .build());
             }
         }
-        addDrawableChild(ButtonWidget.builder(Text.translatable("gui.done"), button -> close())
-                .dimensions(left + 110, top + 67 + Design.values().length * rowStep, 100, 20).build());
+        addDrawableChild(
+                ButtonWidget.builder(Text.translatable("gui.done"), button -> close())
+                        .dimensions(
+                                left + 110, top + 67 + Design.values().length * rowStep, 100, 20)
+                        .build());
     }
 
     @Override
@@ -58,20 +78,44 @@ public final class OutfitScreen extends Screen {
         context.fill(left, top, left + 320, top + panelHeight, 0xEF211D31);
         context.fill(left, top, left + 320, top + 2, 0xFFF4A8CF);
         context.drawCenteredTextWithShadow(textRenderer, title, width / 2, top + 10, 0xFFE9D9F5);
-        context.drawCenteredTextWithShadow(textRenderer, Text.translatable("noopsnet_outfits.pin"), left + 82, top + 31, 0xFFB6DCF5);
-        context.drawCenteredTextWithShadow(textRenderer, Text.translatable("noopsnet_outfits.patch"), left + 238, top + 31, 0xFFF3C3DC);
+        context.drawCenteredTextWithShadow(
+                textRenderer,
+                Text.translatable("noopsnet_outfits.pin"),
+                left + 82,
+                top + 31,
+                0xFFB6DCF5);
+        context.drawCenteredTextWithShadow(
+                textRenderer,
+                Text.translatable("noopsnet_outfits.patch"),
+                left + 238,
+                top + 31,
+                0xFFF3C3DC);
         super.render(context, mouseX, mouseY, delta);
         for (int slot = 0; slot < 2; slot++) {
             for (Design design : Design.values()) {
                 if (design == Design.NONE) continue;
-                context.drawTexture(OutfitFeatureRenderer.texture(slot == 0 ? "pin" : "patch", design),
-                        left + 16 + slot * 156, top + 47 + (rowStep - 16) / 2 + design.ordinal() * rowStep,
-                        0, 0, 16, 16, 16, 16);
+                context.drawTexture(
+                        OutfitFeatureRenderer.texture(slot == 0 ? "pin" : "patch", design),
+                        left + 16 + slot * 156,
+                        top + 47 + (rowStep - 16) / 2 + design.ordinal() * rowStep,
+                        0,
+                        0,
+                        16,
+                        16,
+                        16,
+                        16);
             }
         }
-        context.drawCenteredTextWithShadow(textRenderer, Text.translatable("noopsnet_outfits.visibility"),
-                width / 2, top + 52 + Design.values().length * rowStep, 0xFFADA6BD);
+        context.drawCenteredTextWithShadow(
+                textRenderer,
+                Text.translatable("noopsnet_outfits.visibility"),
+                width / 2,
+                top + 52 + Design.values().length * rowStep,
+                0xFFADA6BD);
     }
 
-    @Override public boolean shouldPause() { return false; }
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
 }

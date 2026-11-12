@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MPL-2.0
 package net.noopsnet.outfits;
 
-import java.util.UUID;
-import net.minecraft.nbt.NbtCompound;
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+
+import net.minecraft.nbt.NbtCompound;
+
+import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 class OutfitStateTest {
     @Test
@@ -38,7 +41,9 @@ class OutfitStateTest {
         nbt.put("players", players);
         OutfitState loaded = OutfitState.read(nbt, null);
         assertEquals(new Outfit(Design.NONE, Design.TRANS), loaded.get(valid));
-        assertEquals(1, loaded.writeNbt(new NbtCompound(), null).getCompound("players").getKeys().size());
+        assertEquals(
+                1,
+                loaded.writeNbt(new NbtCompound(), null).getCompound("players").getKeys().size());
     }
 
     @Test
